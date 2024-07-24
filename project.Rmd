@@ -1,0 +1,85 @@
+---
+title: "Project"
+author: "Anshika Nigam"
+date: "2024-03-29"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# DATA IMPORTING
+
+#install.packages is a command for installing the packages
+install.packages("readr") 
+library(readr)
+airbnbdata<-read.csv("C:/Users/hp/Downloads/AB_NYC_2019.csv")
+View(airbnbdata)
+#VIEW command is used for seeing our Dataset or Data 
+
+#Data cleaning and Transformation# library(dplyr)
+
+#Remove rows with missing values in the "reviews_per_month" column
+airbnbdata\<- filter(airbnbdata, !is.na(reviews_per_month))
+
+#Check for missing values in the dataset sapply(airbnbdata, function(x)
+sum(is.na(x))) airbnbdata\<-subset(airbnbdata, select=
+-neighbourhood_group) View(airbnbdata)
+
+#EXPLORATORY DATA ANALYSIS# #Perform summary statistics
+summary(airbnbdata)
+
+#Select only numeric variables for correlation calculation
+numeric_variables\<-airbnbdata %\>% select_if(is.numeric)
+
+#Calculate correlations correlation_matrix\<-cor(numeric_variables)
+print(correlation_matrix)
+
+#Create visualizations(e.g., histograms, boxplots, scatter plots)
+#Example: library(ggplot2)
+
+#Histrogram of price
+ggplot(airbnbdata,aes(x=price))+geom_histogram(binwidth=50)+labs(x="Price",
+y="Frequency", title="Histrogram of Price")
+
+#Boxplot of price by room_type ggplot(airbnbdata, aes(x=room_type,
+y=price))+geom_boxplot()+labs(x="Room Type", y="Price", title="Boxplot
+of Price by Room Type")
+
+#FEATURE ENGINEERING# #Engineer new features library(dplyr) airbnbdata
+\<- airbnbdata %\>% calculate_distance \<- function()
+mutate(distance_from_landmark = calculate_distance(latitude, longitude,
+landmark_latitude, landmark_longitude)) View(airbnbdata)
+
+#MODELING# #Split the data into training and testing sets set.seed(123)
+train_indices\<-sample(1:nrow(airbnbdata),nrow(airbnbdata)\*0.7)
+train_data\<-airbnbdata[train_indices,]
+test_data\<-airbnbdata[-train_indices,] train_indices train_data
+test_data
+
+#Build a regression model (e.g., using linear regression)
+model\<-lm(price \~ room_type + host_name + distance_from_landmark,data
+= train_data)
+
+#Convert host_name to a factor with the same level as in the train_data
+dataset test_data$host_name<-factor(test_data$host_name,
+levels=levels(train_data\$host_name))
+
+#Generate predictions predictions\<-predict(model,newdata=test_data)
+
+#Create the scatter plot with predicted values
+ggplot(test_data,aes(x=host_name,y=price))+geom_point()+geom_line(data=cbind(test_data,predictions),aes(y=predictions),color="red")+labs(x="Host
+Name",y="Price",title="Regression Model Predictions")
+
+#Model Evaluation# #Evaluate the model using appropriate metrics
+library(Metrics)
+
+#Calculate the root mean squared error(RMSE)
+rmse\<-rmse(test_data_filtered\$price,predictions) print(paste(rmse))
+
+#Calculate the mean absolute error(MAE)
+mae<-mae(test_data_filtered\$price, predictions)
+
+#Print the evaluation metrics print(paste(cat("Root Mean Squared Error
+(RMSE):",rmse,"\n"))) print(paste(cat("Mean Absolute Error
+(MAE):",mae,"\n")))
